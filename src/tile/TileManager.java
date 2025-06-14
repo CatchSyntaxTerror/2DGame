@@ -22,30 +22,31 @@ public class TileManager {
     public TileManager(GamePanel gp) {
         this.gp = gp;
         tile = new Tile[10];
-        mapTileNumber = new int[gp.maxScreenCol][gp.maxScreenRow];
+        mapTileNumber = new int[gp.maxWorldCol][gp.maxWorldRow];
         getTileImage();
-        loadMap();
+        loadMap("/maps/world_map_test.txt");
     }
 
     /**
-     * this method is used to load maps whoch are represented as a 16x12 grid of numbers
+     * This method loads maps
+     * @param mapFilePath path to map file
      */
-    public void loadMap(){
+    public void loadMap(String mapFilePath){
         try {
-            InputStream is = getClass().getResourceAsStream("/maps/map01.txt");
+            InputStream is = getClass().getResourceAsStream(mapFilePath);
             BufferedReader br = new BufferedReader(new InputStreamReader(is));
 
             int col = 0;
             int row = 0;
-            while(col < gp. maxScreenCol && row < gp. maxScreenRow){
+            while(col < gp.maxWorldCol && row < gp.maxWorldRow){
                 String line = br.readLine();
-                while(col < gp.maxScreenCol){
+                while(col < gp.maxWorldCol){
                     String[] numbers = line.split(" ");
                     int num = Integer.parseInt(numbers[col]);
                     mapTileNumber[col][row] = num;
                     col++;
                 }
-                if(col == gp.maxScreenCol) {
+                if(col == gp.maxWorldCol) {
                     col = 0;
                     row++;
                 }
@@ -66,6 +67,12 @@ public class TileManager {
             tile[1].image = ImageIO.read(getClass().getResourceAsStream("/tiles/Wall.png"));
             tile[2] =  new Tile();
             tile[2].image = ImageIO.read(getClass().getResourceAsStream("/tiles/Water.png"));
+            tile[3] =  new Tile();
+            tile[3].image = ImageIO.read(getClass().getResourceAsStream("/tiles/Earth.png"));
+            tile[4] =  new Tile();
+            tile[4].image = ImageIO.read(getClass().getResourceAsStream("/tiles/Tree.png"));
+            tile[5] =  new Tile();
+            tile[5].image = ImageIO.read(getClass().getResourceAsStream("/tiles/Sand.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -76,22 +83,23 @@ public class TileManager {
      * @param g2d graphics passed grom GamePanel
      */
     public void draw(Graphics2D g2d){
-        int row = 0;
-        int col = 0;
-        int x = 0;
-        int y = 0;
+        int worldRow = 0;
+        int worldCol = 0;
 
-        while(col < gp.maxScreenCol &&  row < gp.maxScreenRow){
-            int tileNum = mapTileNumber[col][row];
-            g2d.drawImage(tile[tileNum].image, x, y, gp.tileSize, gp.tileSize, null);
-            col++;
-            x += gp.tileSize;
+        while(worldCol < gp.maxWorldCol &&  worldRow < gp.maxWorldRow){
 
-            if(col == gp.maxScreenCol){
-                col = 0;
-                x = 0;
-                row++;
-                y += gp.tileSize;
+            int tileNum = mapTileNumber[worldCol][worldRow];
+            int worldX = worldCol * gp.tileSize;
+            int worldY = worldRow * gp.tileSize;
+            int screenX = worldX - gp.player.worldX + gp.player.screenX;
+            int screenY = worldY - gp.player.worldY + gp.player.screenY;
+
+            g2d.drawImage(tile[tileNum].image, screenX, screenY, gp.tileSize, gp.tileSize, null);
+            worldCol++;
+
+            if(worldCol == gp.maxWorldCol){
+                worldCol = 0;
+                worldRow++;
             }
         }
     }

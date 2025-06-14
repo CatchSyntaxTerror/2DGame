@@ -11,17 +11,21 @@ import java.io.IOException;
 public class Player extends Entity {
     GamePanel gp;
     KeyHandler kh;
+    public final int screenX;
+    public final int screenY;
 
     public Player(GamePanel gp, KeyHandler kh) {
         this.gp = gp;
         this.kh = kh;
+        screenX = gp.screenWidth/2 - gp.tileSize/2;
+        screenY = gp.screenHeight/2  - gp.tileSize/2;
         setDefaultValues();
         getPlayerImage();
     }
 
     public void setDefaultValues() {
-        x = 100;
-        y = 100;
+        worldX = gp.tileSize * 21;
+        worldY = gp.tileSize * 41;
         speed = 4;
         direction = "down";
     }
@@ -33,16 +37,16 @@ public class Player extends Entity {
         //Todo: add diagonal movement and array key movement
         if (kh.upPressed) {
             direction = "up";
-            y -= speed;
+            worldY -= speed;
         } else if (kh.downPressed) {
             direction = "down";
-            y += speed;
+            worldY += speed;
         } else if (kh.leftPressed) {
             direction = "left";
-            x -= speed;
+            worldX -= speed;
         } else if (kh.rightPressed) {
             direction = "right";
-            x += speed;
+            worldX += speed;
         }
 
         spriteCounter++;
@@ -93,7 +97,7 @@ public class Player extends Entity {
                 }
                 break;
         }
-        g2d.drawImage(image, x, y, gp.tileSize, gp.tileSize, null);
+        g2d.drawImage(image, screenX, screenY, gp.tileSize, gp.tileSize, null);
     }
 
     /**
